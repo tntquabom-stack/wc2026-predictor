@@ -935,7 +935,7 @@ input:checked + .slider-switch:before {
   display: flex;
   flex-direction: column;
   justify-content: space-around;
-  height: 800px;
+  height: 1600px;
   flex: 1;
 }
 
@@ -950,6 +950,7 @@ input:checked + .slider-switch:before {
   flex-direction: column;
   position: relative;
   transition: var(--transition-smooth);
+  flex-shrink: 0;
 }
 
 .bracket-match:hover {

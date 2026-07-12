@@ -1,12 +1,15 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Dự đoán Tỷ số FIFA World Cup 2026 - Thuật toán Poisson & Monte Carlo</title>
-  <meta name="description" content="Website dự đoán tỷ số World Cup 2026 bằng thuật toán phân phối Poisson và mô phỏng Monte Carlo 10,000 lượt. Tự do điều chỉnh phong độ và chỉ số của 48 đội bóng.">
+  <meta name="description"
+    content="Website dự đoán tỷ số World Cup 2026 bằng thuật toán phân phối Poisson và mô phỏng Monte Carlo 10,000 lượt. Tự do điều chỉnh phong độ và chỉ số của 48 đội bóng.">
   <link rel="stylesheet" href="styles.css">
 </head>
+
 <body>
 
   <div class="container">
@@ -16,7 +19,8 @@
         <span class="logo-icon">🏆</span>
         <span class="logo-text">WC 2026 Predictor</span>
       </div>
-      <h1 class="header-tagline">Hệ thống phân tích và giả lập tỷ số World Cup 2026 bằng Trí tuệ nhân tạo & Toán học</h1>
+      <h1 class="header-tagline">Hệ thống phân tích và giả lập tỷ số World Cup 2026 bằng Trí tuệ nhân tạo & Toán học
+      </h1>
     </header>
 
     <!-- Navigation Tabs -->
@@ -38,32 +42,35 @@
     <!-- TAB 1: MATCH PREDICTOR -->
     <main id="tab-predictor" class="tab-content active">
       <div class="predictor-grid">
-        
+
         <!-- Controls & Customizations -->
         <section class="card">
-          <h2 style="margin-bottom: 20px; font-size: 1.4rem; color: var(--color-secondary);">🛠️ Cấu hình cặp đấu & Chỉ số</h2>
-          
+          <h2 style="margin-bottom: 20px; font-size: 1.4rem; color: var(--color-secondary);">🛠️ Cấu hình cặp đấu & Chỉ
+            số</h2>
+
           <!-- Team Selectors -->
           <div class="teams-select-section">
             <div class="team-selector">
               <div class="flag-wrapper">
                 <img id="flag-team-a" class="flag-img" src="https://flagcdn.com/w80/ar.png" alt="Flag A">
               </div>
-              <label for="select-team-a" style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 5px;">ĐỘI A</label>
+              <label for="select-team-a"
+                style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 5px;">ĐỘI A</label>
               <select id="select-team-a" class="custom-select" onchange="onTeamSelect('a')"></select>
             </div>
-            
+
             <div class="vs-badge">VS</div>
-            
+
             <div class="team-selector">
               <div class="flag-wrapper">
                 <img id="flag-team-b" class="flag-img" src="https://flagcdn.com/w80/fr.png" alt="Flag B">
               </div>
-              <label for="select-team-b" style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 5px;">ĐỘI B</label>
+              <label for="select-team-b"
+                style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 5px;">ĐỘI B</label>
               <select id="select-team-b" class="custom-select" onchange="onTeamSelect('b')"></select>
             </div>
           </div>
-          
+
           <!-- Tactical Football Pitch -->
           <div class="tactical-pitch">
             <div class="pitch-lines">
@@ -74,7 +81,7 @@
               <div class="pitch-goal team-a-goal"></div>
               <div class="pitch-goal team-b-goal"></div>
             </div>
-            
+
             <div class="pitch-player team-a-player" id="pitch-player-a">
               <div class="pitch-jersey">
                 <img id="pitch-flag-a" src="https://flagcdn.com/w80/ar.png" alt="Team A">
@@ -82,7 +89,7 @@
               <div class="pitch-player-name" id="pitch-player-name-a">Argentina</div>
               <div class="pitch-player-rating" id="pitch-player-rating-a">ATT: 93</div>
             </div>
-            
+
             <div class="pitch-player team-b-player" id="pitch-player-b">
               <div class="pitch-jersey">
                 <img id="pitch-flag-b" src="https://flagcdn.com/w80/fr.png" alt="Team B">
@@ -97,7 +104,7 @@
             <!-- Team A Sliders -->
             <div class="param-card">
               <h4 style="color: var(--color-primary);"><span id="lbl-team-a-sliders">Đội A</span></h4>
-              
+
               <div class="slider-group">
                 <div class="slider-label">
                   <span>Tấn công (Attack)</span>
@@ -105,7 +112,7 @@
                 </div>
                 <input type="range" id="slider-att-a" min="50" max="99" value="80" oninput="updateStatsRealtime()">
               </div>
-              
+
               <div class="slider-group">
                 <div class="slider-label">
                   <span>Phòng thủ (Defense)</span>
@@ -113,7 +120,7 @@
                 </div>
                 <input type="range" id="slider-def-a" min="50" max="99" value="80" oninput="updateStatsRealtime()">
               </div>
-              
+
               <div class="slider-group">
                 <div class="slider-label">
                   <span>Phong độ (Form)</span>
@@ -126,7 +133,7 @@
             <!-- Team B Sliders -->
             <div class="param-card">
               <h4 style="color: var(--color-secondary);"><span id="lbl-team-b-sliders">Đội B</span></h4>
-              
+
               <div class="slider-group">
                 <div class="slider-label">
                   <span>Tấn công (Attack)</span>
@@ -134,7 +141,7 @@
                 </div>
                 <input type="range" id="slider-att-b" min="50" max="99" value="80" oninput="updateStatsRealtime()">
               </div>
-              
+
               <div class="slider-group">
                 <div class="slider-label">
                   <span>Phòng thủ (Defense)</span>
@@ -142,7 +149,7 @@
                 </div>
                 <input type="range" id="slider-def-b" min="50" max="99" value="80" oninput="updateStatsRealtime()">
               </div>
-              
+
               <div class="slider-group">
                 <div class="slider-label">
                   <span>Phong độ (Form)</span>
@@ -184,17 +191,17 @@
           <!-- Digital Scoreboard -->
           <section class="scoreboard-card">
             <div class="scoreboard-title">Kết quả Dự đoán Trận đấu</div>
-            
+
             <div class="scores-display">
               <span class="score-num" id="score-team-a">0</span>
               <span class="score-colon">:</span>
               <span class="score-num" id="score-team-b">0</span>
             </div>
-            
+
             <div class="penalty-scores" id="penalty-display" style="display: none;">
               (Penalty: A 0 - 0 B)
             </div>
-            
+
             <div class="match-status-tag" id="match-status-badge">Sẵn sàng</div>
 
             <!-- Live Match Commentary Box -->
@@ -213,7 +220,8 @@
 
           <!-- Probabilities Win/Draw/Loss -->
           <section class="probs-bar-container">
-            <div class="heatmap-title" style="margin-bottom: 5px;">Xác suất Thắng - Hòa - Thua (Monte Carlo 10,000 lượt)</div>
+            <div class="heatmap-title" style="margin-bottom: 5px;">Xác suất Thắng - Hòa - Thua (Monte Carlo 10,000 lượt)
+            </div>
             <div class="probs-labels">
               <div class="prob-label">
                 <span class="prob-name" id="prob-lbl-team-a">Đội A Thắng</span>
@@ -228,7 +236,7 @@
                 <span class="prob-val" id="prob-val-team-b" style="color: var(--color-secondary);">30.0%</span>
               </div>
             </div>
-            
+
             <div class="probs-bar">
               <div class="bar-part team-a" id="bar-team-a" style="width: 45%;"></div>
               <div class="bar-part draw" id="bar-draw" style="width: 25%;"></div>
@@ -264,10 +272,12 @@
       <div class="card" style="margin-bottom: 25px;">
         <h2 style="margin-bottom: 15px; color: var(--color-secondary);">📊 Vòng bảng World Cup 2026</h2>
         <p style="color: var(--text-secondary); font-size: 0.95rem; margin-bottom: 20px;">
-          48 quốc gia được chia đều thành 12 bảng đấu từ A đến L. Bạn có thể nhấn nút giả lập để thuật toán tự động chạy toàn bộ các trận đấu vòng bảng dựa trên chỉ số thực lực của từng đội bóng.
+          48 quốc gia được chia đều thành 12 bảng đấu từ A đến L. Bạn có thể nhấn nút giả lập để thuật toán tự động chạy
+          toàn bộ các trận đấu vòng bảng dựa trên chỉ số thực lực của từng đội bóng.
         </p>
         <div class="sim-controls-panel">
-          <button class="btn-secondary sim-primary" onclick="runGroupStageSimulation()">⚡ Giả lập toàn bộ Vòng Bảng</button>
+          <button class="btn-secondary sim-primary" onclick="runGroupStageSimulation()">⚡ Giả lập toàn bộ Vòng
+            Bảng</button>
           <button class="btn-secondary" onclick="resetTournamentUI()">🔄 Reset giải đấu</button>
         </div>
       </div>
@@ -282,10 +292,12 @@
       <div class="card" style="margin-bottom: 25px;">
         <h2 style="margin-bottom: 15px; color: var(--color-secondary);">🌳 Vòng loại trực tiếp (Knockout Bracket)</h2>
         <p style="color: var(--text-secondary); font-size: 0.95rem; margin-bottom: 20px;">
-          Cây đấu trực tiếp bao gồm 32 đội mạnh nhất đi tiếp từ vòng bảng (gồm 24 đội xếp nhất-nhì mỗi bảng và 8 đội xếp thứ ba xuất sắc nhất).
+          Cây đấu trực tiếp bao gồm 32 đội mạnh nhất đi tiếp từ vòng bảng (gồm 24 đội xếp nhất-nhì mỗi bảng và 8 đội xếp
+          thứ ba xuất sắc nhất).
         </p>
         <div class="sim-controls-panel" id="knockout-controls">
-          <button class="btn-secondary sim-primary" id="btn-next-ko-round" onclick="runNextKnockoutRound()">👉 Giả lập vòng đấu kế tiếp</button>
+          <button class="btn-secondary sim-primary" id="btn-next-ko-round" onclick="runNextKnockoutRound()">👉 Giả lập
+            vòng đấu kế tiếp</button>
           <button class="btn-secondary sim-primary" onclick="simulateEntireCup()">⚡ Giả lập nhanh tới Chung Kết</button>
           <button class="btn-secondary" onclick="resetTournamentUI()">🔄 Reset giải đấu</button>
         </div>
@@ -301,7 +313,7 @@
       <!-- Bracket Tree view -->
       <div class="bracket-outer">
         <div class="bracket-wrapper">
-          
+
           <!-- Round of 32 -->
           <div class="bracket-round" id="r32-matches-column">
             <!-- Matches will be added by JS -->
@@ -336,23 +348,27 @@
       <div class="card" style="margin-bottom: 25px;">
         <h2 style="margin-bottom: 15px; color: var(--color-primary);">🌐 Dữ liệu & Kết quả Thực tế World Cup 2026</h2>
         <p style="color: var(--text-secondary); font-size: 0.95rem; margin-bottom: 20px;">
-          Kết quả các trận đấu của FIFA World Cup 2026 được cập nhật trực tiếp. Bạn có thể nhấn nút đồng bộ để cập nhật bảng xếp hạng và nhánh đấu trực tiếp của trang web theo thực tế, từ đó đưa ra các dự đoán chính xác nhất cho các vòng đấu tiếp theo.
+          Kết quả các trận đấu của FIFA World Cup 2026 được cập nhật trực tiếp. Bạn có thể nhấn nút đồng bộ để cập nhật
+          bảng xếp hạng và nhánh đấu trực tiếp của trang web theo thực tế, từ đó đưa ra các dự đoán chính xác nhất cho
+          các vòng đấu tiếp theo.
         </p>
         <div class="sim-controls-panel" style="display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
-          <button class="btn-secondary sim-primary" id="btn-sync-real" onclick="syncTournamentWithRealDataUI()" style="padding: 10px 20px; font-weight: bold; border-radius: 30px;">
+          <button class="btn-secondary sim-primary" id="btn-sync-real" onclick="syncTournamentWithRealDataUI()"
+            style="padding: 10px 20px; font-weight: bold; border-radius: 30px;">
             🔄 Đồng bộ giải đấu theo thực tế
           </button>
           <span id="sync-status" style="font-size: 0.95rem; font-weight: 500;"></span>
         </div>
       </div>
-      
+
       <div id="real-results-container">
         <!-- Will be populated dynamically by loadAndRenderRealResults() -->
       </div>
     </main>
 
     <!-- Footer Credit -->
-    <footer style="text-align: center; margin-top: 50px; padding: 20px 0; font-size: 0.85rem; color: var(--text-muted); border-top: 1px solid rgba(255, 255, 255, 0.05); font-family: var(--font-display);">
+    <footer
+      style="text-align: center; margin-top: 50px; padding: 20px 0; font-size: 0.85rem; color: var(--text-muted); border-top: 1px solid rgba(255, 255, 255, 0.05); font-family: var(--font-display);">
       Developed by Chu Nhật Anh (CNA)
     </footer>
 
@@ -362,17 +378,17 @@
   <script src="teams.js"></script>
   <script src="real_games_fallback.js"></script>
   <script src="app.js"></script>
-  
+
   <!-- UI Interaction Logic -->
   <script>
     // --- Initialize Selectors ---
     function populateTeamSelectors() {
       const selectA = document.getElementById("select-team-a");
       const selectB = document.getElementById("select-team-b");
-      
+
       selectA.innerHTML = "";
       selectB.innerHTML = "";
-      
+
       // Sort alphabetically by Vietnamese name for easier finding
       const sortedTeams = [...TEAMS].sort((x, y) => x.vnName.localeCompare(y.vnName));
 
@@ -400,12 +416,12 @@
     function onTeamSelect(side, isInit = false) {
       const teamId = document.getElementById(`select-team-${side}`).value;
       const team = getTeamById(teamId);
-      
+
       if (!team) return;
 
       // Update flag image
       document.getElementById(`flag-team-${side}`).src = `https://flagcdn.com/w80/${team.flagCode}.png`;
-      
+
       // Update label in sliders card
       document.getElementById(`lbl-team-${side}-sliders`).innerText = `${team.vnName} (Hạng ${team.rank})`;
 
@@ -450,10 +466,10 @@
     function updateStatsRealtime() {
       const selectA = document.getElementById("select-team-a").value;
       const selectB = document.getElementById("select-team-b").value;
-      
+
       const teamA = getTeamById(selectA);
       const teamB = getTeamById(selectB);
-      
+
       if (!teamA || !teamB) return;
 
       // Get modifiers from sliders
@@ -472,7 +488,7 @@
       document.getElementById("val-att-a").innerText = modifiers.attackA;
       document.getElementById("val-def-a").innerText = modifiers.defenseA;
       document.getElementById("val-form-a").innerText = modifiers.formA;
-      
+
       document.getElementById("val-att-b").innerText = modifiers.attackB;
       document.getElementById("val-def-b").innerText = modifiers.defenseB;
       document.getElementById("val-form-b").innerText = modifiers.formB;
@@ -509,10 +525,10 @@
       mcResults.topScores.forEach(item => {
         const row = document.createElement("div");
         row.className = "score-row";
-        
+
         // Format score string replacing "-" with " - "
         const displayScore = item.score.replace("-", " - ");
-        
+
         row.innerHTML = `
           <div class="score-row-name">${displayScore}</div>
           <div class="score-row-bar-bg">
@@ -559,12 +575,12 @@
           const val = grid[i][j];
           const cell = document.createElement("div");
           cell.className = "grid-cell";
-          
+
           // Color opacity scaling based on percentage (max prob typically around 15%)
           const opacity = Math.min(1, val / 15);
           cell.style.backgroundColor = `rgba(99, 102, 241, ${opacity * 0.7 + 0.03})`;
           cell.style.borderColor = `rgba(255, 255, 255, ${opacity * 0.15 + 0.02})`;
-          
+
           // Highlight border for highest probability
           if (val > 6) {
             cell.style.border = `1px solid rgba(0, 242, 254, ${opacity * 0.5})`;
@@ -615,7 +631,7 @@
       const btn = document.getElementById("btn-run-sim");
       btn.disabled = true;
       btn.innerText = "⚽ Đang diễn ra...";
-      
+
       const badge = document.getElementById("match-status-badge");
       badge.className = "match-status-tag live";
       badge.innerText = "Trực tiếp 1'";
@@ -630,7 +646,7 @@
       scoreDispB.innerText = "0";
       scoreDispA.classList.remove("glowing");
       scoreDispB.classList.remove("glowing");
-      
+
       const penDisp = document.getElementById("penalty-display");
       penDisp.style.display = "none";
 
@@ -652,16 +668,16 @@
         while (eventIdx < commentaries.length && commentaries[eventIdx].minute <= displayMin) {
           const item = commentaries[eventIdx];
           const div = document.createElement("div");
-          
+
           if (item.type === "goal") {
             div.className = "comm-item goal";
             div.innerHTML = `<span class="comm-minute">${item.minute}'</span><span class="comm-text">${item.text}</span>`;
-            
+
             // Update board score dynamically
             const scores = item.score.split("-");
             scoreDispA.innerText = scores[0];
             scoreDispB.innerText = scores[1];
-            
+
             // Add momentary highlight glow
             if (item.team === "A") {
               scoreDispA.classList.add("glowing");
@@ -689,18 +705,18 @@
         // Hiệp phụ & penalties animation
         if (gameMinute >= 90) {
           clearInterval(matchSimInterval);
-          
+
           // If match has extra time, play it in a fast sequence
           if (simResult.extraTime) {
             badge.innerText = "Hiệp phụ";
-            
+
             // Loop through remaining extra time/penalty events instantly or with small delay
             let etIdx = 0;
             const extraTimeInterval = setInterval(() => {
               if (eventIdx < commentaries.length) {
                 const item = commentaries[eventIdx];
                 const div = document.createElement("div");
-                
+
                 if (item.type === "goal") {
                   div.className = "comm-item goal";
                   div.innerHTML = `<span class="comm-minute">${item.minute}'</span><span class="comm-text">${item.text}</span>`;
@@ -711,7 +727,7 @@
                   div.className = "comm-item";
                   div.style.color = "var(--color-warning)";
                   div.innerHTML = `<span class="comm-text" style="font-weight:600;">${item.text}</span>`;
-                  
+
                   // Render penalty scoreboard display
                   penDisp.style.display = "block";
                   penDisp.innerText = `Loạt luân lưu: ${teamA.vnName} ${simResult.penA} - ${simResult.penB} ${teamB.vnName}`;
@@ -742,7 +758,7 @@
       badge.className = "match-status-tag";
       badge.innerText = "Kết thúc";
       dot.style.display = "none";
-      
+
       // Make final scores glowing
       document.getElementById("score-team-a").innerText = simResult.goalsA + simResult.etGoalsA;
       document.getElementById("score-team-b").innerText = simResult.goalsB + simResult.etGoalsB;
@@ -769,7 +785,7 @@
         const standings = tournamentState.groups[g];
         const card = document.createElement("div");
         card.className = "group-card";
-        
+
         let rowsHtml = "";
         standings.forEach((s, idx) => {
           const rankClass = idx < 2 ? `qualify-spot-${idx + 1}` : "";
@@ -895,7 +911,7 @@
       matches.forEach(match => {
         const teamA = getTeamById(match.teamAId);
         const teamB = getTeamById(match.teamBId);
-        
+
         const card = document.createElement("div");
         card.className = "bracket-match";
 
@@ -955,7 +971,7 @@
       cardFinal.className = "bracket-match";
       cardFinal.style.borderColor = "var(--color-warning)";
       cardFinal.style.boxShadow = "0 0 15px rgba(234, 179, 8, 0.15)";
-      
+
       const rowAClass = isSimmed ? (winnerId === teamA.id ? "winner" : "loser") : "";
       const rowBClass = isSimmed ? (winnerId === teamB.id ? "winner" : "loser") : "";
       const scoreA = isSimmed ? finalMatch.goalsA : "-";
@@ -996,7 +1012,7 @@
         const cardT3 = document.createElement("div");
         cardT3.className = "bracket-match";
         cardT3.style.marginTop = "40px";
-        
+
         const rowT3AClass = isT3Simmed ? (winnerT3Id === teamT3A.id ? "winner" : "loser") : "";
         const rowT3BClass = isT3Simmed ? (winnerT3Id === teamT3B.id ? "winner" : "loser") : "";
         const scoreT3A = isT3Simmed ? thirdMatch.goalsA : "-";
@@ -1053,7 +1069,7 @@
       if (!tournamentState.groupMatchesSimulated) {
         simulateGroupStage();
       }
-      
+
       if (tournamentState.stage === "round_of_32") {
         generateRoundOf32();
         simulateKnockoutStage("r32");
@@ -1121,6 +1137,22 @@
       const container = document.getElementById("real-results-container");
       container.innerHTML = "";
 
+      // Patch missing scorers in API data
+      games.forEach(g => {
+        const id = parseInt(g.id);
+        if (id === 28) {
+          // Czechia vs South Africa (1-1)
+          if (!g.home_scorers || g.home_scorers === "null") g.home_scorers = '{"?mikhal Sadilk 6\'"}';
+          if (!g.away_scorers || g.away_scorers === "null") g.away_scorers = '{"Teboho Mokoena 83\' (P)"}';
+        } else if (id === 89) {
+          // Paraguay vs France (0-1)
+          if (!g.away_scorers || g.away_scorers === "null") g.away_scorers = '{"Kylian Mbappé 69\' (P)"}';
+        } else if (id === 91) {
+          // Brazil vs Norway (1-2)
+          if (!g.home_scorers || g.home_scorers === "null") g.home_scorers = '{"Neymar 90+10\' (P)"}';
+        }
+      });
+
       // Group games by type/stage
       const stages = {
         "group": { title: "Vòng Bảng (Group Stage)", games: [] },
@@ -1147,6 +1179,7 @@
         stage.games.sort((a, b) => parseInt(a.id) - parseInt(b.id));
 
         const section = document.createElement("section");
+        section.style.styleFloat = "none";
         section.style.marginBottom = "40px";
 
         const header = document.createElement("h3");
@@ -1157,14 +1190,14 @@
         header.style.fontSize = "1.2rem";
         header.style.display = "flex";
         header.style.alignItems = "center";
-        
+
         let icon = "🏁";
         if (key === "group") icon = "📊";
         else if (key === "r32" || key === "r16") icon = "⚽";
         else if (key === "qf") icon = "⚔️";
         else if (key === "sf") icon = "🔥";
         else if (key === "final") icon = "🏆";
-        
+
         header.innerHTML = `<span style="margin-right: 10px;">${icon}</span> ${stage.title} <span style="font-size: 0.8rem; color: var(--text-muted); font-weight: normal; margin-left: 10px;">(${stage.games.length} trận)</span>`;
         section.appendChild(header);
 
@@ -1180,19 +1213,19 @@
           card.style.background = "rgba(9, 19, 14, 0.6)";
           card.style.border = "1px solid var(--border-color)";
           card.style.boxShadow = "none";
-          
+
           const teamA = getTeamById(API_TEAM_MAP[g.home_team_id]);
           const teamB = getTeamById(API_TEAM_MAP[g.away_team_id]);
-          
+
           if (!teamA || !teamB) return;
 
           const isFinished = g.finished === "TRUE";
           const scoreA = isFinished ? g.home_score : "-";
           const scoreB = isFinished ? g.away_score : "-";
-          
+
           let statusText = isFinished ? "Kết thúc" : "Chưa đá";
           let statusClass = isFinished ? "status-finished" : "status-pending";
-          
+
           const hasPen = isFinished && g.home_penalty_score !== null && g.home_penalty_score !== "null" && g.home_penalty_score !== undefined;
           const penHtml = hasPen ? `<div style="font-size:0.75rem; color:var(--color-warning); text-align:center; padding: 4px 0; font-weight:600; background:rgba(0,0,0,0.2); border-top:1px solid rgba(255,255,255,0.03);">Luân lưu: ${g.home_penalty_score} - ${g.away_penalty_score}</div>` : "";
 
@@ -1200,13 +1233,64 @@
             statusText = "Penalty";
           }
 
-          // Scorers list helper
+          // Spelling correction map for players
+          const PLAYER_NAME_FIXES = {
+            "Jvd Blingham": "Jude Bellingham",
+            "Khvlin Alvarz": "Julián Álvarez",
+            "Astfan Avstakviv": "Stephen Eustáquio",
+            "Sharl D Ktlar": "Charles De Ketelaere",
+            "Fabin Rviz": "Fabian Ruiz",
+            "Andrias Shldrvp": "Andreas Schjelderup",
+            "Dn Andvi": "Dan Ndoye",
+            "Khvan Kintrv": "Juan Quintero",
+            "Khamintvn Kampaz": "Jaminton Campaz",
+            "Lviiz Diaz": "Luis Díaz",
+            "?mikhal Sadilk": "Michal Sadílek",
+            "Jovo Lukic": "Jovo Lukić",
+            "J. Quiones": "Julián Quiñones",
+            "R. Jimnez": "Raúl Jiménez",
+            "L. Krejc": "Ladislav Krejčí",
+            "J. Quiñones": "Julián Quiñones",
+            "R. Jiménez": "Raúl Jiménez",
+            "L. Krejčí": "Ladislav Krejčí",
+            "Maurcio": "Maurício",
+            "Maurício": "Maurício"
+          };
+
           const formatScorersList = (scorersStr) => {
             if (!scorersStr || scorersStr === "null" || scorersStr === "[]") return "";
             try {
               // Extract names and times from format like {"Player 10'","Player 20'"} or just string
               let clean = scorersStr.replace(/[\{\}\"\']/g, '').split(',');
-              return clean.filter(s => s.trim() !== "").map(s => `👟 ${s.trim()}`).join('<br>');
+              return clean.filter(s => s.trim() !== "").map(s => {
+                let nameWithMin = s.trim();
+                
+                // Try to separate name and minute, e.g., "Erling Haaland 79'"
+                const match = nameWithMin.match(/^(.+?)\s+(\d+.*?)$/);
+                if (match) {
+                  let name = match[1].trim();
+                  let min = match[2].trim();
+                  
+                  // Check dictionary for corrections
+                  if (PLAYER_NAME_FIXES[name]) {
+                    name = PLAYER_NAME_FIXES[name];
+                  }
+                  
+                  // Clean up encoding markers if any
+                  name = name.replace(/\?/g, '');
+                  return `👟 ${name} ${min}`;
+                }
+                
+                // Fallback replace
+                let cleanedName = nameWithMin;
+                for (const key in PLAYER_NAME_FIXES) {
+                  if (cleanedName.includes(key)) {
+                    cleanedName = cleanedName.replace(key, PLAYER_NAME_FIXES[key]);
+                  }
+                }
+                cleanedName = cleanedName.replace(/\?/g, '');
+                return `👟 ${cleanedName}`;
+              }).join('<br>');
             } catch(e) { return ""; }
           };
 
@@ -1254,7 +1338,7 @@
               ${g.group && g.type === "group" ? `<span>Bảng ${g.group}</span>` : `<span>Knockout</span>`}
             </div>
           `;
-          
+
           grid.appendChild(card);
         });
 
@@ -1266,35 +1350,35 @@
     async function syncTournamentWithRealDataUI() {
       const syncBtn = document.getElementById("btn-sync-real");
       const statusText = document.getElementById("sync-status");
-      
+
       syncBtn.disabled = true;
       syncBtn.innerText = "⏳ Đang đồng bộ...";
       statusText.innerText = "Đang kết nối tải dữ liệu...";
       statusText.style.color = "var(--text-secondary)";
-      
+
       try {
         if (!cachedRealGames) {
           cachedRealGames = await fetchRealGamesData();
         }
-        
+
         // Sync State
         syncTournamentWithRealData(cachedRealGames);
-        
+
         statusText.innerHTML = "✅ Đồng bộ thành công!";
         statusText.style.color = "var(--color-success)";
-        
+
         // Refresh selectors in predictor tab
         populateTeamSelectors();
-        
+
         setTimeout(() => {
           syncBtn.disabled = false;
           syncBtn.innerText = "🔄 Đồng bộ giải đấu theo thực tế";
-          
+
           // Switch to bracket tab to show results!
           switchTab('knockout');
           alert("Đồng bộ dữ liệu World Cup 2026 thực tế thành công! Nhánh đấu trực tiếp đã được cập nhật tới vòng Bán Kết (chuẩn bị thi đấu Pháp vs Tây Ban Nha, Anh vs Argentina). Bạn có thể xem bảng xếp hạng và cây đấu trực tiếp mới nhất.");
         }, 1200);
-        
+
       } catch (error) {
         console.error(error);
         statusText.innerHTML = "❌ Lỗi đồng bộ dữ liệu.";
@@ -1306,11 +1390,12 @@
     }
 
     // --- On Window Load ---
-    window.onload = function() {
+    window.onload = function () {
       initTournament();
       populateTeamSelectors();
       updateStatsRealtime();
     };
   </script>
 </body>
+
 </html>
