@@ -17,6 +17,19 @@ function poissonProbability(k, lambda) {
 function calculateExpectedGoals(teamA, teamB, modifiers = {}) {
   const baseAvgGoals = 1.35; // average goals per team per match in WC
 
+  // Tournament momentum: teams that have performed exceptionally well
+  // in the actual WC2026 get a slight boost reflecting real form
+  const TOURNAMENT_MOMENTUM = {
+    'argentina': 1.08, // Finalist: comeback king, Messi on fire, 2 kiến tạo bán kết
+    'spain': 1.07,     // Finalist: dominant defense, clean sheet vs France in SF
+    'france': 1.03,    // Semifinalist: strong run but lost 0-2 in SF
+    'england': 1.02,   // Semifinalist: Bellingham carried but faded late
+    'belgium': 1.02,   // QF: destroyed USA 4-1
+    'norway': 1.04,    // QF surprise: eliminated Brazil
+    'switzerland': 1.03, // QF: beat Colombia on penalties
+    'morocco': 1.02    // QF: strong defensive display
+  };
+
   // Custom sliders inputs (default to initial team ratings if not provided)
   const attackA = modifiers.attackA !== undefined ? modifiers.attackA : teamA.attack;
   const defenseA = modifiers.defenseA !== undefined ? modifiers.defenseA : teamA.defense;
@@ -41,9 +54,13 @@ function calculateExpectedGoals(teamA, teamB, modifiers = {}) {
   const hostFactorA = (hostAdvantage && teamA.host) ? 1.15 : 1.0;
   const hostFactorB = (hostAdvantage && teamB.host) ? 1.15 : 1.0;
 
+  // Tournament momentum factor
+  const momentumA = TOURNAMENT_MOMENTUM[teamA.id] || 1.0;
+  const momentumB = TOURNAMENT_MOMENTUM[teamB.id] || 1.0;
+
   // Expected goals (lambda)
-  let lambdaA = baseAvgGoals * attStrengthA * defWeaknessB * formFactorA * hostFactorA;
-  let lambdaB = baseAvgGoals * attStrengthB * defWeaknessA * formFactorB * hostFactorB;
+  let lambdaA = baseAvgGoals * attStrengthA * defWeaknessB * formFactorA * hostFactorA * momentumA;
+  let lambdaB = baseAvgGoals * attStrengthB * defWeaknessA * formFactorB * hostFactorB * momentumB;
 
   // Ensure lambda is positive and reasonable
   lambdaA = Math.max(0.1, lambdaA);
