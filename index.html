@@ -4,9 +4,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dự đoán Tỷ số FIFA World Cup 2026 - Thuật toán Poisson & Monte Carlo</title>
+  <title>FIFA World Cup 2026 Final - Thuật toán Dixon-Coles & Poisson Predictor</title>
   <meta name="description"
-    content="Website dự đoán tỷ số World Cup 2026 bằng thuật toán phân phối Poisson và mô phỏng Monte Carlo 10,000 lượt. Tự do điều chỉnh phong độ và chỉ số của 48 đội bóng.">
+    content="Trang web tổng kết kết quả thi đấu chính thức FIFA World Cup 2026 và dự đoán tỷ số bóng đá bằng Thuật toán Dixon-Coles, phân phối Poisson & Monte Carlo 10,000 lượt.">
   <link rel="stylesheet" href="styles.css">
 </head>
 
@@ -19,9 +19,27 @@
         <span class="logo-icon">🏆</span>
         <span class="logo-text">WC 2026 Predictor</span>
       </div>
-      <h1 class="header-tagline">Hệ thống phân tích và giả lập tỷ số World Cup 2026 bằng Trí tuệ nhân tạo & Toán học
-      </h1>
+      <h1 class="header-tagline">Hệ thống phân tích, tổng kết & giả lập tỷ số World Cup 2026 (Đã hạ màn 19/07/2026)</h1>
     </header>
+
+    <!-- World Cup 2026 Champion Banner -->
+    <div class="champion-banner" style="background: linear-gradient(135deg, rgba(255, 215, 0, 0.15), rgba(255, 75, 75, 0.15)); border: 1px solid rgba(255, 215, 0, 0.4); border-radius: 16px; padding: 16px 24px; margin-bottom: 24px; display: flex; align-items: center; justify-content: space-between; gap: 15px; flex-wrap: wrap;">
+      <div style="display: flex; align-items: center; gap: 15px;">
+        <div style="font-size: 2.2rem; filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.6));">🏆</div>
+        <div>
+          <div style="font-weight: 800; font-size: 1.1rem; color: #ffd700; display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+            WORLD CUP 2026 ĐÃ CHÍNH THỨC KẾT THÚC!
+            <span style="background: var(--color-primary); color: #000; font-size: 0.7rem; font-weight: 800; padding: 2px 8px; border-radius: 12px; text-transform: uppercase;">Official Data Updated</span>
+          </div>
+          <div style="font-size: 0.88rem; color: var(--text-secondary); margin-top: 4px;">
+            🥇 Vô địch: <strong style="color: #fff;">🇪🇸 TÂY BAN NHA</strong> (2 - 1 Argentina) | 🥈 Á quân: 🇦🇷 Argentina | 🥉 Hạng 3: 🏴󠁧󠁢󠁥󠁮󠁧󠁿 Anh
+          </div>
+        </div>
+      </div>
+      <button onclick="switchTab('real-results')" class="btn-secondary" style="border-color: rgba(255, 215, 0, 0.5); color: #ffd700; background: rgba(0,0,0,0.3); padding: 8px 16px; font-size: 0.85rem; border-radius: 20px; cursor: pointer; white-space: nowrap;">
+        🌐 Xem Kết quả Thực tế 104 trận
+      </button>
+    </div>
 
     <!-- Navigation Tabs -->
     <nav class="nav-tabs">
@@ -45,14 +63,25 @@
 
         <!-- Controls & Customizations -->
         <section class="card">
-          <h2 style="margin-bottom: 20px; font-size: 1.4rem; color: var(--color-secondary);">🛠️ Cấu hình cặp đấu & Chỉ
-            số</h2>
+          <h2 style="margin-bottom: 20px; font-size: 1.4rem; color: var(--color-secondary);">🛠️ Cấu hình cặp đấu & Chỉ số</h2>
+
+          <!-- Algorithm Model Selector -->
+          <div style="margin-bottom: 20px; background: rgba(0,0,0,0.25); padding: 12px 16px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.06);">
+            <label for="select-algo-engine" style="font-size: 0.85rem; font-weight: 700; color: var(--color-primary); display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+              ⚙️ Thuật toán Mô phỏng:
+            </label>
+            <select id="select-algo-engine" class="custom-select" onchange="updateStatsRealtime()" style="width: 100%; font-size: 0.9rem; background: var(--bg-dark); cursor: pointer;">
+              <option value="dixon_coles" selected>🎯 Dixon-Coles & Poisson Hybrid v2026.4 (Khuyên dùng - Chuẩn Post-WC)</option>
+              <option value="monte_carlo">🎲 Mô phỏng Monte Carlo (10,000 lượt trận)</option>
+              <option value="elo_hybrid">⚡ Mô hình Hybrid Elo & Phong độ Giải đấu</option>
+            </select>
+          </div>
 
           <!-- Team Selectors -->
           <div class="teams-select-section">
             <div class="team-selector">
               <div class="flag-wrapper">
-                <img id="flag-team-a" class="flag-img" src="https://flagcdn.com/w80/ar.png" alt="Flag A">
+                <img id="flag-team-a" class="flag-img" src="https://flagcdn.com/w80/es.png" alt="Flag A">
               </div>
               <label for="select-team-a"
                 style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 5px;">ĐỘI A</label>
@@ -289,15 +318,46 @@
 
     <!-- TAB 3: KNOCKOUT BRACKET -->
     <main id="tab-knockout" class="tab-content">
-      <div class="card" style="margin-bottom: 25px;">
-        <h2 style="margin-bottom: 15px; color: var(--color-secondary);">🌳 Vòng loại trực tiếp (Knockout Bracket)</h2>
+      <div class="card" style="margin-bottom: 20px;">
+        <h2 style="margin-bottom: 12px; color: var(--color-secondary);">🌳 Vòng loại trực tiếp (Knockout Bracket)</h2>
         <p style="color: var(--text-secondary); font-size: 0.95rem; margin-bottom: 20px;">
           Cây đấu trực tiếp bao gồm 32 đội mạnh nhất đi tiếp từ vòng bảng (gồm 24 đội xếp nhất-nhì mỗi bảng và 8 đội xếp
           thứ ba xuất sắc nhất).
         </p>
+
+        <!-- Stage-by-Stage Real Data Sync Panel -->
+        <div style="background: rgba(13, 27, 42, 0.7); border: 1px solid rgba(0, 242, 254, 0.3); border-radius: 12px; padding: 16px 20px; margin-bottom: 20px;">
+          <h3 style="margin-bottom: 10px; color: var(--color-primary); font-size: 1.05rem; display: flex; align-items: center; gap: 8px;">
+            🌐 Đồng bộ Dữ liệu Thực tế theo từng Vòng đấu:
+          </h3>
+          <p style="color: var(--text-secondary); font-size: 0.86rem; margin-bottom: 14px; line-height: 1.4;">
+            Chọn mốc vòng đấu bạn muốn lấy kết quả thực tế ngoài đời. Ví dụ: Đồng bộ đến <strong>Bán kết</strong> để hiển thị cặp đấu Chung kết thực tế (Tây Ban Nha vs Argentina) và tự do chạy bộ giả lập cho trận Chung kết!
+          </p>
+          <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
+            <button class="btn-secondary" onclick="syncTournamentWithStageUI('group')" style="border-color: rgba(255,255,255,0.2); font-size: 0.82rem; padding: 6px 14px; border-radius: 20px; cursor: pointer;">
+              📊 Vòng Bảng
+            </button>
+            <button class="btn-secondary" onclick="syncTournamentWithStageUI('r32')" style="border-color: rgba(255,255,255,0.2); font-size: 0.82rem; padding: 6px 14px; border-radius: 20px; cursor: pointer;">
+              ⚽ Đến Vòng 32 đội
+            </button>
+            <button class="btn-secondary" onclick="syncTournamentWithStageUI('r16')" style="border-color: rgba(255,255,255,0.2); font-size: 0.82rem; padding: 6px 14px; border-radius: 20px; cursor: pointer;">
+              🔥 Đến Vòng 16 đội
+            </button>
+            <button class="btn-secondary" onclick="syncTournamentWithStageUI('qf')" style="border-color: rgba(255,255,255,0.2); font-size: 0.82rem; padding: 6px 14px; border-radius: 20px; cursor: pointer;">
+              ⚔️ Đến Tứ Kết
+            </button>
+            <button class="btn-secondary" onclick="syncTournamentWithStageUI('sf')" style="border-color: var(--color-warning); color: var(--color-warning); font-size: 0.82rem; padding: 6px 14px; border-radius: 20px; font-weight: 700; cursor: pointer;">
+              🚀 Đến Bán Kết (Dự đoán Chung Kết)
+            </button>
+            <button class="btn-secondary sim-primary" onclick="syncTournamentWithStageUI('final')" style="font-size: 0.82rem; padding: 6px 14px; border-radius: 20px; font-weight: 700; cursor: pointer;">
+              🏆 Đồng bộ Tất cả (104 Trận)
+            </button>
+          </div>
+          <div id="sync-stage-status" style="font-size: 0.84rem; margin-top: 10px; font-weight: 600;"></div>
+        </div>
+
         <div class="sim-controls-panel" id="knockout-controls">
-          <button class="btn-secondary sim-primary" id="btn-next-ko-round" onclick="runNextKnockoutRound()">👉 Giả lập
-            vòng đấu kế tiếp</button>
+          <button class="btn-secondary sim-primary" id="btn-next-ko-round" onclick="runNextKnockoutRound()">👉 Giả lập vòng đấu kế tiếp</button>
           <button class="btn-secondary sim-primary" onclick="simulateEntireCup()">⚡ Giả lập nhanh tới Chung Kết</button>
           <button class="btn-secondary" onclick="resetTournamentUI()">🔄 Reset giải đấu</button>
         </div>
@@ -1070,25 +1130,30 @@
         simulateGroupStage();
       }
 
-      if (tournamentState.stage === "round_of_32") {
-        generateRoundOf32();
-        simulateKnockoutStage("r32");
-      }
-      if (tournamentState.stage === "round_of_16") {
-        simulateKnockoutStage("r16");
-      }
-      if (tournamentState.stage === "quarterfinals") {
-        simulateKnockoutStage("qf");
-      }
-      if (tournamentState.stage === "semifinals") {
-        simulateKnockoutStage("sf");
-      }
-      if (tournamentState.stage === "final") {
-        simulateKnockoutStage("final");
+      let maxSteps = 10;
+      while (tournamentState.stage !== "finished" && maxSteps > 0) {
+        maxSteps--;
+        if (tournamentState.stage === "round_of_32") {
+          generateRoundOf32();
+          simulateKnockoutStage("r32");
+        } else if (tournamentState.stage === "round_of_16") {
+          simulateKnockoutStage("r16");
+        } else if (tournamentState.stage === "quarterfinals") {
+          simulateKnockoutStage("qf");
+        } else if (tournamentState.stage === "semifinals") {
+          simulateKnockoutStage("sf");
+        } else if (tournamentState.stage === "final") {
+          simulateKnockoutStage("final");
+        } else {
+          break;
+        }
       }
 
       renderKnockoutUI();
-      alert("Đã mô phỏng xong toàn bộ giải đấu! Cuộn xuống để xem Nhà vô địch.");
+      
+      const winnerTeam = tournamentState.knockoutBracket.winner ? getTeamById(tournamentState.knockoutBracket.winner) : null;
+      const winnerName = winnerTeam ? winnerTeam.vnName : "Chưa xác định";
+      alert(`Đã mô phỏng thành công các trận đấu tiếp theo đến hết trận Chung kết!\n\n🏆 NHÀ VÔ ĐỊCH DỰ ĐOÁN: ${winnerName.toUpperCase()}`);
     }
 
     function resetTournamentUI() {
@@ -1381,7 +1446,7 @@
 
           // Switch to bracket tab to show results!
           switchTab('knockout');
-          alert("Đồng bộ dữ liệu World Cup 2026 thực tế thành công! Bán kết đã kết thúc: Pháp 0-2 Tây Ban Nha, Anh 1-2 Argentina. Cặp đấu chung kết đã xác định: Tây Ban Nha vs Argentina (19/07/2026). Tranh hạng 3: Pháp vs Anh (18/07/2026). Bạn có thể dự đoán tỷ số chung kết ngay bây giờ!");
+          alert("Đồng bộ toàn bộ 104 trận đấu World Cup 2026 thực tế thành công!\n\n🏆 NHÀ VÔ ĐỊCH: TÂY BAN NHA 🇪🇸\n🥇 Chung kết: Tây Ban Nha 2 - 1 Argentina (Lamine Yamal 23', Oyarzabal 88' / Messi 41')\n🥉 Tranh hạng ba: Anh 2 - 1 Pháp (Bellingham 54', Kane 81' / Mbappé 38')\n\nToàn bộ sơ đồ nhánh đấu và bảng danh dự đã được cập nhật hoàn chỉnh!");
         }, 1200);
 
       } catch (error) {
@@ -1391,6 +1456,48 @@
         syncBtn.disabled = false;
         syncBtn.innerText = "🔄 Đồng bộ giải đấu theo thực tế";
         alert("Lỗi: Không thể đồng bộ giải đấu. Vui lòng kiểm tra lại kết nối mạng.");
+      }
+    }
+
+    async function syncTournamentWithStageUI(targetStage = 'final') {
+      const statusText = document.getElementById("sync-stage-status");
+      if (statusText) {
+        statusText.innerHTML = "⏳ Đang kết nối & đồng bộ dữ liệu thực tế...";
+        statusText.style.color = "var(--text-secondary)";
+      }
+
+      try {
+        if (!cachedRealGames) {
+          cachedRealGames = await fetchRealGamesData();
+        }
+
+        // Sync State with specified stage
+        syncTournamentWithRealData(cachedRealGames, targetStage);
+
+        const stageNamesMap = {
+          'group': 'Vòng Bảng (Chuẩn bị Vòng 32 đội)',
+          'r32': 'Đến Vòng 32 Đội (Chuẩn bị Vòng 16 đội)',
+          'r16': 'Đến Vòng 16 Đội (Chuẩn bị Tứ kết)',
+          'qf': 'Đến Tứ Kết (Chuẩn bị Bán kết)',
+          'sf': 'Đến Bán Kết (Sẵn sàng dự đoán Chung kết Tây Ban Nha vs Argentina)',
+          'final': 'Toàn bộ 104 Trận đấu (Nhà vô địch: Tây Ban Nha 🇪🇸)'
+        };
+
+        const stageNameVN = stageNamesMap[targetStage] || 'Vòng đấu đã chọn';
+        if (statusText) {
+          statusText.innerHTML = `✅ Đã đồng bộ dữ liệu thực tế: <span style="color: var(--color-primary);">${stageNameVN}</span>!`;
+        }
+
+        // Refresh team selectors & render knockout UI
+        populateTeamSelectors();
+        renderKnockoutUI();
+
+      } catch (error) {
+        console.error(error);
+        if (statusText) {
+          statusText.innerHTML = "❌ Lỗi khi đồng bộ dữ liệu thực tế.";
+          statusText.style.color = "var(--color-danger)";
+        }
       }
     }
 

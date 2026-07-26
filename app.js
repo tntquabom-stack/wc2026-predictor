@@ -17,17 +17,16 @@ function poissonProbability(k, lambda) {
 function calculateExpectedGoals(teamA, teamB, modifiers = {}) {
   const baseAvgGoals = 1.35; // average goals per team per match in WC
 
-  // Tournament momentum: teams that have performed exceptionally well
-  // in the actual WC2026 get a slight boost reflecting real form
+  // Post-WC2026 Tournament Momentum (reflecting official final standings)
   const TOURNAMENT_MOMENTUM = {
-    'argentina': 1.08, // Finalist: comeback king, Messi on fire, 2 kiến tạo bán kết
-    'spain': 1.07,     // Finalist: dominant defense, clean sheet vs France in SF
-    'france': 1.03,    // Semifinalist: strong run but lost 0-2 in SF
-    'england': 1.02,   // Semifinalist: Bellingham carried but faded late
-    'belgium': 1.02,   // QF: destroyed USA 4-1
-    'norway': 1.04,    // QF surprise: eliminated Brazil
-    'switzerland': 1.03, // QF: beat Colombia on penalties
-    'morocco': 1.02    // QF: strong defensive display
+    'spain': 1.12,     // Champions: World Cup 2026 Winner (defeated Argentina 2-1)
+    'argentina': 1.10, // Finalists: Runners-up
+    'france': 1.06,    // 3rd Place: Defeated England 2-1
+    'england': 1.04,   // 4th Place: Semifinalists
+    'belgium': 1.03,   // QF
+    'norway': 1.06,    // QF surprise: eliminated Brazil
+    'switzerland': 1.04, // QF
+    'morocco': 1.03    // QF
   };
 
   // Custom sliders inputs (default to initial team ratings if not provided)
@@ -51,8 +50,8 @@ function calculateExpectedGoals(teamA, teamB, modifiers = {}) {
 
   // Host advantage (applied to USA, MEX, CAN if modifiers.hostAdvantage is enabled)
   const hostAdvantage = modifiers.hostAdvantage !== false;
-  const hostFactorA = (hostAdvantage && teamA.host) ? 1.15 : 1.0;
-  const hostFactorB = (hostAdvantage && teamB.host) ? 1.15 : 1.0;
+  const hostFactorA = (hostAdvantage && teamA.host) ? 1.12 : 1.0;
+  const hostFactorB = (hostAdvantage && teamB.host) ? 1.12 : 1.0;
 
   // Tournament momentum factor
   const momentumA = TOURNAMENT_MOMENTUM[teamA.id] || 1.0;
@@ -152,38 +151,94 @@ function simulateMatch(teamA, teamB, modifiers = {}, isKnockout = false) {
   };
 }
 
-// Monte Carlo simulation for Win/Draw/Loss odds & Score probabilities
+// Advanced Simulation Engine: Dixon-Coles & Poisson v2026.4 Final Engine
 function runMonteCarlo(teamA, teamB, modifiers = {}, simulationsCount = 10000) {
   const { lambdaA, lambdaB } = calculateExpectedGoals(teamA, teamB, modifiers);
+  
+  // Detect chosen engine mode from UI selector or default to dixon_coles
+  const algoSelect = typeof document !== 'undefined' ? document.getElementById("select-algo-engine") : null;
+  const algoEngine = (algoSelect && algoSelect.value) ? algoSelect.value : "dixon_coles";
 
-  let winsA = 0;
-  let draws = 0;
-  let winsB = 0;
-
-  const scoreFrequencies = {};
-
-  for (let i = 0; i < simulationsCount; i++) {
-    const goalsA = samplePoisson(lambdaA);
-    const goalsB = samplePoisson(lambdaB);
-
-    if (goalsA > goalsB) {
-      winsA++;
-    } else if (goalsA === goalsB) {
-      draws++;
-    } else {
-      winsB++;
-    }
-
-    const scoreKey = `${goalsA}-${goalsB}`;
-    scoreFrequencies[scoreKey] = (scoreFrequencies[scoreKey] || 0) + 1;
+  // Dixon-Coles tau adjustment parameter for low scorelines (0-0, 1-0, 0-1, 1-1)
+  const rho = -0.13;
+  function dixonColesTau(gA, gB, lA, lB) {
+    if (gA === 0 && gB === 0) return 1 - (lA * lB * rho);
+    if (gA === 1 && gB === 0) return 1 + (lB * rho);
+    if (gA === 0 && gB === 1) return 1 + (lA * rho);
+    if (gA === 1 && gB === 1) return 1 - rho;
+    return 1.0;
   }
 
-  // Calculate percentages
-  const probA = (winsA / simulationsCount) * 100;
-  const probDraw = (draws / simulationsCount) * 100;
-  const probB = (winsB / simulationsCount) * 100;
+  // Generate Poisson-Dixon-Coles grid (up to 5-5 goals)
+  const poissonGrid = [];
+  let totalGridProb = 0;
+  for (let i = 0; i <= 5; i++) {
+    poissonGrid[i] = [];
+    for (let j = 0; j <= 5; j++) {
+      const pA = poissonProbability(i, lambdaA);
+      const pB = poissonProbability(j, lambdaB);
+      let tau = 1.0;
+      if (algoEngine === "dixon_coles") {
+        tau = dixonColesTau(i, j, lambdaA, lambdaB);
+      }
+      const cellProb = Math.max(0, pA * pB * tau);
+      poissonGrid[i][j] = cellProb;
+      totalGridProb += cellProb;
+    }
+  }
 
-  // Find top scorelines
+  // Normalize grid percentages
+  for (let i = 0; i <= 5; i++) {
+    for (let j = 0; j <= 5; j++) {
+      poissonGrid[i][j] = (poissonGrid[i][j] / Math.max(0.0001, totalGridProb)) * 100;
+    }
+  }
+
+  let probA = 0;
+  let probDraw = 0;
+  let probB = 0;
+  const scoreFrequencies = {};
+
+  if (algoEngine === "monte_carlo") {
+    let winsA = 0, draws = 0, winsB = 0;
+    for (let i = 0; i < simulationsCount; i++) {
+      const gA = samplePoisson(lambdaA);
+      const gB = samplePoisson(lambdaB);
+
+      if (gA > gB) winsA++;
+      else if (gA === gB) draws++;
+      else winsB++;
+
+      const key = `${gA}-${gB}`;
+      scoreFrequencies[key] = (scoreFrequencies[key] || 0) + 1;
+    }
+    probA = (winsA / simulationsCount) * 100;
+    probDraw = (draws / simulationsCount) * 100;
+    probB = (winsB / simulationsCount) * 100;
+  } else {
+    // Exact analytical Dixon-Coles integration
+    for (let i = 0; i <= 5; i++) {
+      for (let j = 0; j <= 5; j++) {
+        const pct = poissonGrid[i][j];
+        if (i > j) probA += pct;
+        else if (i === j) probDraw += pct;
+        else probB += pct;
+
+        const key = `${i}-${j}`;
+        scoreFrequencies[key] = (pct / 100) * simulationsCount;
+      }
+    }
+  }
+
+  if (algoEngine === "elo_hybrid") {
+    // Incorporate dynamic Post-WC2026 Elo rating differential adjustment
+    const eloDiff = (teamB.rank - teamA.rank) * 10;
+    const eloWinProbA = 1 / (1 + Math.pow(10, -eloDiff / 400));
+    probA = (probA * 0.65) + (eloWinProbA * 100 * 0.35);
+    probB = Math.max(1, 100 - probA - probDraw);
+  }
+
+  // Top scorelines
   const sortedScores = Object.entries(scoreFrequencies)
     .map(([score, count]) => ({
       score,
@@ -192,18 +247,6 @@ function runMonteCarlo(teamA, teamB, modifiers = {}, simulationsCount = 10000) {
     .sort((a, b) => b.percentage - a.percentage)
     .slice(0, 5);
 
-  // Generate a Poisson grid (up to 5-5 goals) for heatmap
-  const poissonGrid = [];
-  for (let i = 0; i <= 5; i++) {
-    poissonGrid[i] = [];
-    for (let j = 0; j <= 5; j++) {
-      const pA = poissonProbability(i, lambdaA);
-      const pB = poissonProbability(j, lambdaB);
-      poissonGrid[i][j] = pA * pB * 100; // in percentage
-    }
-  }
-
-  // Determine the analytical "most likely score" from Poisson
   let maxProb = -1;
   let mlScore = "1-1";
   for (let i = 0; i <= 5; i++) {
@@ -224,7 +267,8 @@ function runMonteCarlo(teamA, teamB, modifiers = {}, simulationsCount = 10000) {
     mostLikelyScore: mlScore,
     mostLikelyProb: maxProb,
     expectedGoalsA: lambdaA,
-    expectedGoalsB: lambdaB
+    expectedGoalsB: lambdaB,
+    engineName: algoEngine
   };
 }
 
@@ -834,23 +878,114 @@ async function fetchRealGamesData() {
   }
 }
 
-// Synchronize tournament state with real match results
-function syncTournamentWithRealData(gamesList) {
-  // 1. Reset group standings
-  for (const g in tournamentState.groups) {
-    tournamentState.groups[g].forEach(standing => {
-      standing.played = 0;
-      standing.won = 0;
-      standing.drawn = 0;
-      standing.lost = 0;
-      standing.goalsFor = 0;
-      standing.goalsAgainst = 0;
-      standing.goalDifference = 0;
-      standing.points = 0;
-    });
-  }
 
-  // 2. Map Group Stage Matches (type === 'group')
+  // Helper to generate next stage match structures from previous stage winners
+function generateNextStagePairings(completedStage) {
+  if (completedStage === "r32") {
+    const r32 = tournamentState.knockoutBracket.r32;
+    tournamentState.knockoutBracket.r16 = [];
+    for (let i = 0; i < r32.length; i += 2) {
+      const winner1 = r32[i] ? r32[i].winnerId : null;
+      const winner2 = r32[i + 1] ? r32[i + 1].winnerId : null;
+      tournamentState.knockoutBracket.r16.push({
+        id: `R16_M${Math.floor(i / 2) + 1}`,
+        teamAId: winner1,
+        teamBId: winner2,
+        goalsA: null,
+        goalsB: null,
+        extraTime: false,
+        penalties: false,
+        penA: null,
+        penB: null,
+        winnerId: null,
+        simulated: false
+      });
+    }
+  } else if (completedStage === "r16") {
+    const r16 = tournamentState.knockoutBracket.r16;
+    tournamentState.knockoutBracket.qf = [];
+    for (let i = 0; i < r16.length; i += 2) {
+      const winner1 = r16[i] ? r16[i].winnerId : null;
+      const winner2 = r16[i + 1] ? r16[i + 1].winnerId : null;
+      tournamentState.knockoutBracket.qf.push({
+        id: `QF_M${Math.floor(i / 2) + 1}`,
+        teamAId: winner1,
+        teamBId: winner2,
+        goalsA: null,
+        goalsB: null,
+        extraTime: false,
+        penalties: false,
+        penA: null,
+        penB: null,
+        winnerId: null,
+        simulated: false
+      });
+    }
+  } else if (completedStage === "qf") {
+    const qf = tournamentState.knockoutBracket.qf;
+    tournamentState.knockoutBracket.sf = [];
+    for (let i = 0; i < qf.length; i += 2) {
+      const winner1 = qf[i] ? qf[i].winnerId : null;
+      const winner2 = qf[i + 1] ? qf[i + 1].winnerId : null;
+      tournamentState.knockoutBracket.sf.push({
+        id: `SF_M${Math.floor(i / 2) + 1}`,
+        teamAId: winner1,
+        teamBId: winner2,
+        goalsA: null,
+        goalsB: null,
+        extraTime: false,
+        penalties: false,
+        penA: null,
+        penB: null,
+        winnerId: null,
+        simulated: false
+      });
+    }
+  } else if (completedStage === "sf") {
+    const sf = tournamentState.knockoutBracket.sf;
+    if (sf.length >= 2) {
+      const winnerSF1 = sf[0].winnerId;
+      const winnerSF2 = sf[1].winnerId;
+      const loserSF1 = sf[0].winnerId === sf[0].teamAId ? sf[0].teamBId : sf[0].teamAId;
+      const loserSF2 = sf[1].winnerId === sf[1].teamAId ? sf[1].teamBId : sf[1].teamAId;
+
+      tournamentState.knockoutBracket.thirdPlace = {
+        id: "THIRD_PLACE",
+        teamAId: loserSF1,
+        teamBId: loserSF2,
+        goalsA: null,
+        goalsB: null,
+        extraTime: false,
+        penalties: false,
+        penA: null,
+        penB: null,
+        winnerId: null,
+        simulated: false
+      };
+
+      tournamentState.knockoutBracket.final = {
+        id: "FINAL",
+        teamAId: winnerSF1,
+        teamBId: winnerSF2,
+        goalsA: null,
+        goalsB: null,
+        extraTime: false,
+        penalties: false,
+        penA: null,
+        penB: null,
+        winnerId: null,
+        simulated: false
+      };
+    }
+  }
+}
+
+// Synchronize tournament state with real match results up to a specific target stage
+function syncTournamentWithRealData(gamesList, targetStage = "final") {
+  // Reset tournament state first
+  initTournament();
+
+  // 1. Map Group Stage Matches (type === 'group')
   const apiGroupMatches = gamesList.filter(g => g.type === "group");
   
   tournamentState.groupMatches.forEach(match => {
@@ -917,20 +1052,26 @@ function syncTournamentWithRealData(gamesList) {
 
   tournamentState.groupMatchesSimulated = true;
 
-  // 3. Map Knockout Stages (r32, r16, qf, sf, final, third)
-  const mapStageMatches = (apiType, stateBracketArray, prefixId) => {
-    const apiStageMatches = gamesList.filter(g => g.type === apiType);
-    
-    // Sort matches by API ID to ensure stable ordering
-    apiStageMatches.sort((a, b) => parseInt(a.id) - parseInt(b.id));
+  if (targetStage === "group") {
+    tournamentState.stage = "round_of_32";
+    generateRoundOf32();
+    console.log("Tournament synced up to Group Stage.");
+    return;
+  }
 
-    // Clear state bracket array
+  // Stage hierarchy levels
+  const stageLevels = { "r32": 1, "r16": 2, "qf": 3, "sf": 4, "final": 5 };
+  const targetLevel = stageLevels[targetStage] || 5;
+
+  const mapStageMatches = (apiType, stateBracketArray, prefixId, shouldSimulate) => {
+    const apiStageMatches = gamesList.filter(g => g.type === apiType);
+    apiStageMatches.sort((a, b) => parseInt(a.id) - parseInt(b.id));
     stateBracketArray.length = 0;
 
     apiStageMatches.forEach((am, index) => {
       const teamAId = API_TEAM_MAP[am.home_team_id];
       const teamBId = API_TEAM_MAP[am.away_team_id];
-      const isFinished = am.finished === "TRUE";
+      const isFinished = shouldSimulate && am.finished === "TRUE";
 
       const matchObj = {
         id: `${prefixId}_M${index + 1}`,
@@ -946,7 +1087,6 @@ function syncTournamentWithRealData(gamesList) {
         simulated: isFinished
       };
 
-      // Handle penalties if they happened
       if (isFinished) {
         const hasPenalties = am.home_penalty_score !== null && am.home_penalty_score !== "null" && am.home_penalty_score !== undefined;
         if (hasPenalties) {
@@ -956,16 +1096,11 @@ function syncTournamentWithRealData(gamesList) {
           matchObj.penB = parseInt(am.away_penalty_score);
           matchObj.winnerId = matchObj.penA > matchObj.penB ? teamAId : teamBId;
         } else {
-          // Check for extra time: since score includes extra time, if it's finished and not a draw,
-          // check if there is an extra time goal (e.g. scorer min > 90) or simply check if it went to extra time
           const hasETGoals = (am.home_scorers && am.home_scorers.includes("90+")) || 
                              (am.away_scorers && am.away_scorers.includes("90+")) ||
                              (am.home_scorers && /9\d'|1[0-2]\d'/.test(am.home_scorers)) ||
                              (am.away_scorers && /9\d'|1[0-2]\d'/.test(am.away_scorers));
-          
-          if (hasETGoals) {
-            matchObj.extraTime = true;
-          }
+          if (hasETGoals) matchObj.extraTime = true;
           matchObj.winnerId = matchObj.goalsA > matchObj.goalsB ? teamAId : teamBId;
         }
       }
@@ -974,19 +1109,47 @@ function syncTournamentWithRealData(gamesList) {
     });
   };
 
-  // Map each round
-  mapStageMatches("r32", tournamentState.knockoutBracket.r32, "R32");
-  mapStageMatches("r16", tournamentState.knockoutBracket.r16, "R16");
-  mapStageMatches("qf", tournamentState.knockoutBracket.qf, "QF");
-  mapStageMatches("sf", tournamentState.knockoutBracket.sf, "SF");
+  // Map rounds according to target level
+  mapStageMatches("r32", tournamentState.knockoutBracket.r32, "R32", targetLevel >= 1);
+  if (targetLevel === 1) {
+    generateNextStagePairings("r32");
+    tournamentState.stage = "round_of_16";
+    console.log("Tournament synced up to Round of 32.");
+    return;
+  }
 
-  // Map Final & Third place
+  mapStageMatches("r16", tournamentState.knockoutBracket.r16, "R16", targetLevel >= 2);
+  if (targetLevel === 2) {
+    generateNextStagePairings("r16");
+    tournamentState.stage = "quarterfinals";
+    console.log("Tournament synced up to Round of 16.");
+    return;
+  }
+
+  mapStageMatches("qf", tournamentState.knockoutBracket.qf, "QF", targetLevel >= 3);
+  if (targetLevel === 3) {
+    generateNextStagePairings("qf");
+    tournamentState.stage = "semifinals";
+    console.log("Tournament synced up to Quarterfinals.");
+    return;
+  }
+
+  mapStageMatches("sf", tournamentState.knockoutBracket.sf, "SF", targetLevel >= 4);
+  if (targetLevel === 4) {
+    generateNextStagePairings("sf");
+    tournamentState.stage = "final";
+    console.log("Tournament synced up to Semifinals.");
+    return;
+  }
+
+  // Map Final & Third place for complete sync (targetLevel >= 5)
   const apiFinalGames = gamesList.filter(g => g.type === "final");
   const apiThirdGames = gamesList.filter(g => g.type === "third");
+  const simFinal = targetLevel >= 5;
 
   if (apiFinalGames.length > 0) {
     const am = apiFinalGames[0];
-    const isFinished = am.finished === "TRUE";
+    const isFinished = simFinal && am.finished === "TRUE";
     const teamAId = API_TEAM_MAP[am.home_team_id] || null;
     const teamBId = API_TEAM_MAP[am.away_team_id] || null;
 
@@ -1018,7 +1181,7 @@ function syncTournamentWithRealData(gamesList) {
 
   if (apiThirdGames.length > 0) {
     const am = apiThirdGames[0];
-    const isFinished = am.finished === "TRUE";
+    const isFinished = simFinal && am.finished === "TRUE";
     const teamAId = API_TEAM_MAP[am.home_team_id] || null;
     const teamBId = API_TEAM_MAP[am.away_team_id] || null;
 
@@ -1048,30 +1211,15 @@ function syncTournamentWithRealData(gamesList) {
     }
   }
 
-  // 4. Set current tournament stage based on the first unfinished stage
-  const r32Unfinished = tournamentState.knockoutBracket.r32.some(m => !m.simulated);
-  const r16Unfinished = tournamentState.knockoutBracket.r16.some(m => !m.simulated);
-  const qfUnfinished = tournamentState.knockoutBracket.qf.some(m => !m.simulated);
-  const sfUnfinished = tournamentState.knockoutBracket.sf.some(m => !m.simulated);
-  const finalUnfinished = !tournamentState.knockoutBracket.final || !tournamentState.knockoutBracket.final.simulated;
-
-  if (r32Unfinished) {
-    tournamentState.stage = "round_of_32";
-  } else if (r16Unfinished) {
-    tournamentState.stage = "round_of_16";
-  } else if (qfUnfinished) {
-    tournamentState.stage = "quarterfinals";
-  } else if (sfUnfinished) {
-    tournamentState.stage = "semifinals";
-  } else if (finalUnfinished) {
-    tournamentState.stage = "final";
-  } else {
+  if (simFinal && tournamentState.knockoutBracket.final && tournamentState.knockoutBracket.final.simulated) {
     tournamentState.stage = "finished";
     tournamentState.knockoutBracket.winner = tournamentState.knockoutBracket.final.winnerId;
     if (tournamentState.knockoutBracket.thirdPlace) {
       tournamentState.knockoutBracket.thirdPlaceWinner = tournamentState.knockoutBracket.thirdPlace.winnerId;
     }
+  } else {
+    tournamentState.stage = "final";
   }
 
-  console.log("Tournament successfully synchronized with real-world results. Stage is now:", tournamentState.stage);
+  console.log("Tournament successfully synchronized up to stage:", tournamentState.stage);
 }

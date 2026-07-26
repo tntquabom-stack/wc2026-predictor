@@ -1,4 +1,4 @@
-﻿const REAL_GAMES_FALLBACK = {
+const REAL_GAMES_FALLBACK = {
     "games":  [
                   {
                       "_id":  "679c9c8a5749c4077500e001",
@@ -2461,40 +2461,48 @@
                       "id":  "103",
                       "home_team_id":  "33",
                       "away_team_id":  "45",
-                      "home_score":  "0",
-                      "away_score":  "0",
-                      "home_scorers":  "null",
-                      "away_scorers":  "null",
+                      "home_score":  "1",
+                      "away_score":  "2",
+                      "home_scorers":  "{\"Kylian Mbapp\u00e9 38\u0027\"}",
+                      "away_scorers":  "{\"Jude Bellingham 54\u0027\",\"Harry Kane 81\u0027\"}",
                       "group":  "3RD",
                       "matchday":  "8",
                       "local_date":  "07/18/2026 17:00",
                       "persian_date":  "1405-04-27 17:00",
                       "stadium_id":  "8",
-                      "finished":  "FALSE",
-                      "time_elapsed":  "notstarted",
+                      "finished":  "TRUE",
+                      "time_elapsed":  "finished",
                       "type":  "third",
                       "home_team_label":  "Loser Match 101",
-                      "away_team_label":  "Loser Match 102"
+                      "away_team_label":  "Loser Match 102",
+                      "home_team_name_en":  "France",
+                      "home_team_name_fa":  "فرانسه",
+                      "away_team_name_en":  "England",
+                      "away_team_name_fa":  "انگلستان"
                   },
                   {
                       "_id":  "679c9c8a5749c4077500e092",
                       "id":  "104",
                       "home_team_id":  "29",
                       "away_team_id":  "37",
-                      "home_score":  "0",
-                      "away_score":  "0",
-                      "home_scorers":  "null",
-                      "away_scorers":  "null",
+                      "home_score":  "2",
+                      "away_score":  "1",
+                      "home_scorers":  "{\"Lamine Yamal 23\u0027\",\"Mikel Oyarzabal 88\u0027\"}",
+                      "away_scorers":  "{\"Lionel Messi 41\u0027\"}",
                       "group":  "FINAL",
                       "matchday":  "9",
                       "local_date":  "07/19/2026 15:00",
                       "persian_date":  "1405-04-28 15:00",
                       "stadium_id":  "11",
-                      "finished":  "FALSE",
-                      "time_elapsed":  "notstarted",
+                      "finished":  "TRUE",
+                      "time_elapsed":  "finished",
                       "type":  "final",
                       "home_team_label":  "Winner Match 101",
-                      "away_team_label":  "Winner Match 102"
+                      "away_team_label":  "Winner Match 102",
+                      "home_team_name_en":  "Spain",
+                      "home_team_name_fa":  "اسپانیا",
+                      "away_team_name_en":  "Argentina",
+                      "away_team_name_fa":  "آرژانتین"
                   }
               ]
 }
